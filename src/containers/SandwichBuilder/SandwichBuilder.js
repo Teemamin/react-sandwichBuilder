@@ -30,6 +30,9 @@ class SandwichBuilder extends Component{
     purchasingHandler =()=>{
         this.setState({purchasing:true})
     }
+    cancelPurchaseHandler = ()=>{
+        this.setState({purchasing:false})
+    }
 
     canPurchaseHandler = (ingredients)=>{
         let sum = Object.keys(ingredients).map(
@@ -85,7 +88,7 @@ class SandwichBuilder extends Component{
         }
         return(
             <Auxi>
-                <Modal show={this.state.purchasing}>
+                <Modal show={this.state.purchasing}purchaseCancel={this.cancelPurchaseHandler}> 
                     <OrderSummary ingredients={this.state.ingredients}/>
                 </Modal>
                  <Sandwich ingredients={this.state.ingredients}/>

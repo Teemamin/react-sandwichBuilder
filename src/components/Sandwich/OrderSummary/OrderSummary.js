@@ -13,6 +13,9 @@ const OrderSummary = (props)=>{
             <ul>
                 {orderIngredients}
             </ul>
+            <button>CONTINUE</button>
+            <button>CANCEL</button>
+
             <p>Continue to checkout ?</p>
         </Auxi>
     )
