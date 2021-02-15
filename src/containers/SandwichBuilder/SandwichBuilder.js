@@ -1,8 +1,9 @@
 import React,{Component} from "react"
 import Auxi from "../../hoc/Auxi"
-import Sandwich from "../../components/Layout/Sandwich/Sandwich"
-import BuildControls from "../../components/Layout/Sandwich/BuildControls/BuildControls"
-// import BuildControls from "../../components/Layout/Sandwich/BuildControls/BuildControl/BuildControl"
+import Sandwich from "../../components/Sandwich/Sandwich";
+import BuildControls from "../../components/Sandwich/BuildControls/BuildControls";
+import Modal from "../../components/UI/Modal/Modal";
+import OrderSummary from "../../components/Sandwich/OrderSummary/OrderSummary"
 
 const INGREDIENTS_PRICES = {
     salad : 0.10,
@@ -20,8 +21,25 @@ class SandwichBuilder extends Component{
             meat : 0
 
         },
-        totalPrice : 5
+        totalPrice : 5,
+        canPurchase : false,
+        purchasing : false,
 
+    }
+
+    purchasingHandler =()=>{
+        this.setState({purchasing:true})
+    }
+
+    canPurchaseHandler = (ingredients)=>{
+        let sum = Object.keys(ingredients).map(
+            igKeg =>{
+                return ingredients[igKeg]
+            }
+        ).reduce((sum,el)=>{
+            return sum + el
+        },0)
+        this.setState({canPurchase:sum > 0})
     }
 
     addIngredientHandler=(type)=>{
@@ -35,6 +53,7 @@ class SandwichBuilder extends Component{
         let oldPrice = this.state.totalPrice
         let newPrice = adon + oldPrice
         this.setState({totalPrice:newPrice,ingredients:updatedIngredient})
+        this.canPurchaseHandler(updatedIngredient)
 
     }
     removeIngredientHandler=(type)=>{
@@ -51,6 +70,7 @@ class SandwichBuilder extends Component{
         let oldPrice = this.state.totalPrice
         let newPrice = adon - oldPrice
         this.setState({totalPrice:newPrice,ingredients:updatedIngredient})
+        this.canPurchaseHandler(updatedIngredient)
 
     }
 
@@ -65,12 +85,18 @@ class SandwichBuilder extends Component{
         }
         return(
             <Auxi>
+                <Modal show={this.state.purchasing}>
+                    <OrderSummary ingredients={this.state.ingredients}/>
+                </Modal>
                  <Sandwich ingredients={this.state.ingredients}/>
                 <div>
                   <BuildControls 
                     addIngredientHandler={this.addIngredientHandler}
                     removeIngredientHandler={this.removeIngredientHandler}
                     disabled={disabledInfo}
+                    price={this.state.totalPrice}
+                    canPurchase={this.state.canPurchase}
+                    purchasingHandler={this.purchasingHandler}
                     />
                 </div>
             </Auxi>
