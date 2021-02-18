@@ -99,7 +99,6 @@ class SandwichBuilder extends Component{
                         clicked={this.cancelPurchaseHandler}/>
                 </Modal>
                  <Sandwich ingredients={this.state.ingredients}/>
-                <div>
                   <BuildControls 
                     addIngredientHandler={this.addIngredientHandler}
                     removeIngredientHandler={this.removeIngredientHandler}
@@ -108,7 +107,6 @@ class SandwichBuilder extends Component{
                     canPurchase={this.state.canPurchase}
                     purchasingHandler={this.purchasingHandler}
                     />
-                </div>
             </Auxi>
         )
     }
