@@ -27,6 +27,10 @@ class SandwichBuilder extends Component{
 
     }
 
+    continuePurchaseHandler = ()=>{
+        alert("you have clicked continue purchase!")
+    }
+
     purchasingHandler =()=>{
         this.setState({purchasing:true})
     }
@@ -89,7 +93,10 @@ class SandwichBuilder extends Component{
         return(
             <Auxi>
                 <Modal show={this.state.purchasing}purchaseCancel={this.cancelPurchaseHandler}> 
-                    <OrderSummary ingredients={this.state.ingredients}/>
+                    <OrderSummary ingredients={this.state.ingredients} 
+                        totalPrice={this.state.totalPrice}
+                        clickedContinue={this.continuePurchaseHandler}
+                        clicked={this.cancelPurchaseHandler}/>
                 </Modal>
                  <Sandwich ingredients={this.state.ingredients}/>
                 <div>
