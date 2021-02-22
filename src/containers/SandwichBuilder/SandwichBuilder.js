@@ -4,6 +4,9 @@ import Sandwich from "../../components/Sandwich/Sandwich";
 import BuildControls from "../../components/Sandwich/BuildControls/BuildControls";
 import Modal from "../../components/UI/Modal/Modal";
 import OrderSummary from "../../components/Sandwich/OrderSummary/OrderSummary"
+import axios from "../../axios-order"
+import Spinner from "../../components/UI/Spinner/Spinner"
+import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler"
 
 const INGREDIENTS_PRICES = {
     salad : 0.10,
@@ -24,11 +27,20 @@ class SandwichBuilder extends Component{
         totalPrice : 5,
         canPurchase : false,
         purchasing : false,
+        loading : false
 
     }
 
     continuePurchaseHandler = ()=>{
-        alert("you have clicked continue purchase!")
+        this.setState({loading:true})
+        let data = {
+            ingredients: this.state.ingredients,
+            totalPrice : this.state.totalPrice
+        }
+        axios.post("/orders.json",data)
+            .then(res=>{
+                this.setState({loading:false,purchasing:false})})
+            .catch(e=>{this.setState({loading:false,purchasing:false})})
     }
 
     purchasingHandler =()=>{
@@ -90,13 +102,17 @@ class SandwichBuilder extends Component{
         for(let key in disabledInfo){
             disabledInfo[key] = disabledInfo[key] <=0
         }
+        let orderSummary = <OrderSummary ingredients={this.state.ingredients} 
+        totalPrice={this.state.totalPrice}
+        clickedContinue={this.continuePurchaseHandler}
+        clicked={this.cancelPurchaseHandler}/>
+        if(this.state.loading){
+            orderSummary = <Spinner />
+        }
         return(
             <Auxi>
-                <Modal show={this.state.purchasing}purchaseCancel={this.cancelPurchaseHandler}> 
-                    <OrderSummary ingredients={this.state.ingredients} 
-                        totalPrice={this.state.totalPrice}
-                        clickedContinue={this.continuePurchaseHandler}
-                        clicked={this.cancelPurchaseHandler}/>
+                <Modal show={this.state.purchasing}clicked={this.cancelPurchaseHandler}> 
+                    {orderSummary}
                 </Modal>
                  <Sandwich ingredients={this.state.ingredients}/>
                   <BuildControls 
@@ -112,4 +128,4 @@ class SandwichBuilder extends Component{
     }
 }
 
-export default SandwichBuilder
+export default withErrorHandler(SandwichBuilder,axios)
