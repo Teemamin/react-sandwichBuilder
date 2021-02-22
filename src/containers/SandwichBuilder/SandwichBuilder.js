@@ -17,18 +17,23 @@ const INGREDIENTS_PRICES = {
 
 class SandwichBuilder extends Component{
     state = {
-        ingredients :{
-            salad : 0,
-            bacon : 0,
-            cheese : 0,
-            meat : 0
-
-        },
+        ingredients :null,
         totalPrice : 5,
         canPurchase : false,
         purchasing : false,
-        loading : false
+        loading : false,
+        error : false
 
+    }
+
+    componentDidMount(){
+        axios.get("https://react-sandwich-app-4420a-default-rtdb.firebaseio.com/ingredients.json")
+            .then(res=>{
+                this.setState({ingredients:res.data})
+            })
+            .catch(e=>{
+                this.setState({error:e})
+            })
     }
 
     continuePurchaseHandler = ()=>{
@@ -102,27 +107,39 @@ class SandwichBuilder extends Component{
         for(let key in disabledInfo){
             disabledInfo[key] = disabledInfo[key] <=0
         }
-        let orderSummary = <OrderSummary ingredients={this.state.ingredients} 
-        totalPrice={this.state.totalPrice}
-        clickedContinue={this.continuePurchaseHandler}
-        clicked={this.cancelPurchaseHandler}/>
+        let orderSummary = null
+        let showSandwich = this.state.error ? <p>Trouble loading Ingredients</p>:<Spinner />
+        if(this.state.ingredients){
+                 showSandwich = (
+                    <Auxi>
+                        <Sandwich ingredients={this.state.ingredients }/>
+                        <BuildControls 
+                        addIngredientHandler={this.addIngredientHandler}
+                        removeIngredientHandler={this.removeIngredientHandler}
+                        disabled={disabledInfo}
+                        price={this.state.totalPrice}
+                        canPurchase={this.state.canPurchase}
+                        purchasingHandler={this.purchasingHandler}
+                        />
+                    </Auxi>
+                    )
+                    orderSummary = <OrderSummary 
+                        ingredients={this.state.ingredients} 
+                        totalPrice={this.state.totalPrice}
+                        clickedContinue={this.continuePurchaseHandler}
+                        clicked={this.cancelPurchaseHandler}
+                        />
+        }
         if(this.state.loading){
             orderSummary = <Spinner />
         }
+        
         return(
             <Auxi>
                 <Modal show={this.state.purchasing}clicked={this.cancelPurchaseHandler}> 
                     {orderSummary}
                 </Modal>
-                 <Sandwich ingredients={this.state.ingredients}/>
-                  <BuildControls 
-                    addIngredientHandler={this.addIngredientHandler}
-                    removeIngredientHandler={this.removeIngredientHandler}
-                    disabled={disabledInfo}
-                    price={this.state.totalPrice}
-                    canPurchase={this.state.canPurchase}
-                    purchasingHandler={this.purchasingHandler}
-                    />
+                {showSandwich}
             </Auxi>
         )
     }
